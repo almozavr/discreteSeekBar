@@ -143,6 +143,7 @@ public class DiscreteSeekBar extends View {
     private int mKeyProgressIncrement = 1;
     private boolean mMirrorForRtl = false;
     private boolean mAllowTrackClick = true;
+    private boolean mAlwaysShowIndicator = false;
     //We use our own Formatter to avoid creating new instances on every progress change
     Formatter mFormatter;
     private String mIndicatorFormatter;
@@ -193,6 +194,7 @@ public class DiscreteSeekBar extends View {
         int value = 0;
         mMirrorForRtl = a.getBoolean(R.styleable.DiscreteSeekBar_dsb_mirrorForRtl, mMirrorForRtl);
         mAllowTrackClick = a.getBoolean(R.styleable.DiscreteSeekBar_dsb_allowTrackClickToDrag, mAllowTrackClick);
+        mAlwaysShowIndicator = a.getBoolean(R.styleable.DiscreteSeekBar_dsb_alwaysShowIndicator, mAlwaysShowIndicator);
 
         int indexMax = R.styleable.DiscreteSeekBar_dsb_max;
         int indexMin = R.styleable.DiscreteSeekBar_dsb_min;
@@ -437,6 +439,15 @@ public class DiscreteSeekBar extends View {
         mScrubber.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
     }
 
+    public boolean alwaysShowIndicator() {
+        return mAlwaysShowIndicator;
+    }
+
+    public void setAlwaysShowIndicator(boolean show) {
+        this.mAlwaysShowIndicator = show;
+        updateFromDrawableState();
+    }
+
     private void notifyProgress(int value, boolean fromUser) {
         if (mPublicChangeListener != null) {
             mPublicChangeListener.onProgressChanged(DiscreteSeekBar.this, value, fromUser);
@@ -567,7 +578,7 @@ public class DiscreteSeekBar extends View {
                 pressed = true;
             }
         }
-        if (isEnabled() && (focused || pressed)) {
+        if ((isEnabled() && (focused || pressed)) || mAlwaysShowIndicator) {
             //We want to add a small delay here to avoid
             //poping in/out on simple taps
             removeCallbacks(mShowIndicatorRunnable);
@@ -878,7 +889,7 @@ public class DiscreteSeekBar extends View {
 
     private void showFloater() {
         if (!isInEditMode()) {
-            mThumb.animateToPressed();
+            if (!mAlwaysShowIndicator) mThumb.animateToPressed();
             mIndicator.showIndicator(this, mThumb.getBounds());
             notifyBubble(true);
         }
