@@ -622,7 +622,7 @@ public class DiscreteSeekBar extends View {
         } else {
             mFormatBuilder.setLength(0);
         }
-        return mFormatter.format(format, value).toString();
+        return mFormatter.format(format, ((long) value)).toString();
     }
 
     @Override
